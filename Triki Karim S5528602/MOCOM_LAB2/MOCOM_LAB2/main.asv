@@ -1,0 +1,166 @@
+%% Modelling and Control of Manipulator assignment 2: Manipulator Geometry and Direct kinematic
+clc;
+clear;
+close all;
+addpath('include');
+
+
+%% 1.
+% You will need to define all the model matrices, and fill the so called iTj matrices inside BuildTree() function 
+% Be careful to define the z-axis coinciding with the joint rotation axis,
+% and such that the positive rotation is the same as showed in the CAD model you received.
+geom_model = BuildTree();
+% Useful initizializations
+numberOfLinks = 7;                     % number of manipulator's links.
+linkType = [0 0 0 0 0 0 0];            % boolean that specifies two possible link types: Rotational, Prismatic.
+bri= zeros(3,numberOfLinks);           % Basic vector of i-th link w.r.t. base
+biTei = zeros(4,4,numberOfLinks);        % Trasformation matrix i-th link w.r.t. base
+
+linkNumber_i = randi ([1 7]);
+linkNumber_j = randi([1 7]);
+
+iTj = zeros(4,4,1);
+% Initial joint configuration 
+q = [1.3,1.3,1.3,1.3,1.3,1.3,1.3];
+
+% Q1.1 and Q1.2
+biTei = GetDirectGeometry(q, geom_model, linkType);
+
+
+%Q1.3
+for i =1: numberOfLinks
+    biTei(:,:,i)= GetTransformationWrtBase(biTei ,i); 
+end
+
+for i= 1:length(linkNumber_i)   
+    iTj(:,:,i) = GetFrameWrtFrame(linkNumber_i,linkNumber_j,biTei);
+end
+
+for i = 1: numberOfLinks
+    bri(:,i) = GetBasicVectorWrtBase(biTei, i);
+   
+end
+
+% Q1.4
+% Hint: use plot3() and line() matlab functions. 
+numberOfSteps =100;
+  q1 = [1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3];
+  q1f = [2, 2, 2, 2, 2, 2, 2];
+  biTei_q1 = GetDirectGeometry(q1,geom_model,linkType);
+  biTei_q1f = GetDirectGeometry(q1f,geom_model,linkType);
+
+for i = 1:numberOfLinks
+
+bri_q1(:,i) = GetBasicVectorWrtBase(biTei_q1,i);
+bri_q1f(:,i) = GetBasicVectorWrtBase(biTei_q1f,i);
+
+end
+
+figure
+for i = 1:numberOfSteps
+    plot3(bri_q1(1,:),bri_q1(2,:),bri_q1(3,:),'o');
+    line(bri_q1(1,:),bri_q1(2,:),bri_q1(3,:));
+    grid on
+    hold on
+    plot3(bri_q1f(1,:),bri_q1f(2,:),bri_q1f(3,:),'o');
+    line(bri_q1f(1,:),bri_q1f(2,:),bri_q1f(3,:));
+end
+  q2 = [1.3, 0, 1.3, 1.7, 1.3, 0.8, 1.3];
+  q2f = [2, 0, 1.3, 1.7, 1.3, 0.8, 1.3];
+  biTei_q2 = GetDirectGeometry(q2,geom_model,linkType);
+  biTei_q2f = GetDirectGeometry(q2f,geom_model,linkType);
+
+for i = 1:numberOfLinks
+
+ bri_q2(:,i) = GetBasicVectorWrtBase(biTei_q2,i);
+ bri_q2f(:,i) = GetBasicVectorWrtBase(biTei_q2f,i);
+
+end
+
+figure
+for i = 1:numberOfSteps
+    plot3(bri_q2(1,:),bri_q2(2,:),bri_q2(3,:),'o');
+    line(bri_q2(1,:),bri_q2(2,:),bri_q2(3,:));
+    grid on
+    hold on
+    plot3(bri_q2f(1,:),bri_q2f(2,:),bri_q2f(3,:),'o');
+    line(bri_q2f(1,:),bri_q2f(2,:),bri_q2f(3,:));
+end
+
+  q3 = [1.3, 0.1, 0.1, 1, 0.2, 0.3, 1.3];
+  q3f = [2, 2, 2, 2, 2, 2, 2];
+  biTei_q3= GetDirectGeometry(q3,geom_model,linkType);
+  biTei_q3f = GetDirectGeometry(q3f,geom_model,linkType);
+
+for i = 1:numberOfLinks
+
+ bri_q3(:,i) = GetBasicVectorWrtBase(biTei_q3,i);
+ bri_q3f(:,i) = GetBasicVectorWrtBase(biTei_q3f,i);
+
+end
+figure
+for i = 1:numberOfSteps
+    plot3(bri_q3(1,:),bri_q3(2,:),bri_q3(3,:),'o');
+    line(bri_q3(1,:),bri_q3(2,:),bri_q3(3,:));
+    grid on
+    hold on
+    plot3(bri_q3f(1,:),bri_q3f(2,:),bri_q3f(3,:),'o');
+    line(bri_q3f(1,:),bri_q3f(2,:),bri_q3f(3,:));
+end
+%Q1.5
+q5 = [0, 0, 0, 1, 0, 0, 0];
+q5f = [0, 0, 0, pi, 0, 0, 0];
+biTei_q5 = GetDirectGeometry(q5, geom_model, linkType);
+biTei_q5f = GetDirectGeometry(q5f, geom_model, linkType);
+for i = 1:numberOfLinks
+    bri_q5(:,i) = GetBasicVectorWrtBase(biTei_q5 ,i);
+    bri_q5f(:,i) = GetBasicVectorWrtBase(biTei_q5f, i);
+end
+
+figure
+for i = 1:numberOfSteps
+    plot3(bri_q5(1,:),bri_q5(2,:),bri_q5(3,:),'o');
+    line(bri_q5(1,:),bri_q5(2,:),bri_q5(3,:));
+    grid on
+    hold on
+    plot3(bri_q5f(1,:),bri_q5f(2,:),bri_q5f(3,:),'o');
+    line(bri_q5f(1,:),bri_q5f(2,:),bri_q5f(3,:));
+end
+
+q6 = [75, 1001, 69, 1, 0, 0, 0];
+q6f = [75, 1111, 69, 1, 0, 0, 0];
+biTei_q6 = GetDirectGeometry(q6, geom_model, linkType);
+biTei_q6f = GetDirectGeometry(q6f, geom_model, linkType);
+for i = 1:numberOfLinks
+    bri_q6(:,i) = GetBasicVectorWrtBase(biTei_q6 ,i);
+    bri_q6f(:,i) = GetBasicVectorWrtBase(biTei_q6f, i);
+end
+
+figure
+for i = 1:numberOfSteps
+    plot3(bri_q6(1,:),bri_q6(2,:),bri_q6(3,:),'o');
+    line(bri_q6(1,:),bri_q6(2,:),bri_q6(3,:));
+    grid on
+    hold on
+    plot3(bri_q6f(1,:),bri_q6f(2,:),bri_q6f(3,:),'o');
+    line(bri_q6f(1,:),bri_q6f(2,:),bri_q6f(3,:));
+end
+
+q7 = [7, 10, 11, 35, 8, 16, 15];
+q7f = [7, 10, 11, 35, 8, 16, 31];
+biTei_q7 = GetDirectGeometry(q7, geom_model, linkType);
+biTei_q7f = GetDirectGeometry(q7f, geom_model, linkType);
+for i = 1:numberOfLinks
+    bri_q7(:,i) = GetBasicVectorWrtBase(biTei_q7 ,i);
+    bri_q7f(:,i) = GetBasicVectorWrtBase(biTei_q7f, i);
+end
+
+figure
+for i = 1:numberOfSteps
+    plot3(bri_q7(1,:),bri_q7(2,:),bri_q7(3,:),'o');
+    line(bri_q7(1,:),bri_q7(2,:),bri_q7(3,:));
+    grid on
+    hold on
+    plot3(bri_q7f(1,:),bri_q7f(2,:),bri_q7f(3,:),'o');
+    line(bri_q7f(1,:),bri_q7f(2,:),bri_q7f(3,:));
+end
